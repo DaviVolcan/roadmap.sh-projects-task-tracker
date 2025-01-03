@@ -107,6 +107,7 @@ func markTaskAs(tasks *[]Task, idParameter string, status string) error {
 	for index, task := range *tasks {
 		if task.ID == num {
 			(*tasks)[index].Status = status
+			(*tasks)[index].UpdatedAt = time.Now().UTC()
 			foundTask = true
 			break
 		}
