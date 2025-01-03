@@ -42,7 +42,7 @@ func Dispatcher(commands []string, tasks *[]Task) error {
 			return ErrTooFewArguments
 		}
 		return markTaskAs(tasks, commands[1], "in-progress")
-	case "done":
+	case "mark-done":
 		if numberOfArgs > 2 {
 			return ErrTooManyArguments
 		}
