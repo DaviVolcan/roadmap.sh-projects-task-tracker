@@ -26,7 +26,8 @@ func Dispatcher(commands []string, tasks *[]Task) error {
 		if numberOfArgs == 1 {
 			return ErrTooFewArguments
 		}
-		return addTask(commands[1], tasks)
+		addTask(commands[1], tasks)
+		return nil
 
 	default:
 		return ErrUnknownCommand
@@ -34,7 +35,7 @@ func Dispatcher(commands []string, tasks *[]Task) error {
 
 }
 
-func addTask(description string, tasks *[]Task) error {
+func addTask(description string, tasks *[]Task) {
 	instantTIme := time.Now().UTC()
 	task := Task{
 		ID:          time.Now().Nanosecond(),
@@ -44,9 +45,6 @@ func addTask(description string, tasks *[]Task) error {
 	}
 
 	*tasks = append(*tasks, task)
-	return nil
-	// todo verify erros
-
 }
 
 func main() {
@@ -56,17 +54,19 @@ func main() {
 		fmt.Println("Nenhum argumento foi passado.")
 		return
 	}
-
 	err, tasks := loadTasks("tasks.json")
 	if err != nil {
-		//todo treat error
+		panic(err)
 	}
 	err = Dispatcher(args, &tasks)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 	fmt.Println(err)
-
 	err = saveTasks(tasks, "tasks.json")
 	if err != nil {
-		os.Exit(1)
+		panic(err)
 	}
 
 }
