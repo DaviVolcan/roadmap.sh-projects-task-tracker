@@ -50,6 +50,14 @@ func Dispatcher(commands []string, tasks *[]Task) error {
 			return ErrTooFewArguments
 		}
 		return markTaskAs(tasks, commands[1], "done")
+	case "update":
+		if numberOfArgs > 3 {
+			return ErrTooManyArguments
+		}
+		if numberOfArgs <= 2 {
+			return ErrTooFewArguments
+		}
+		return UpdateTaskDescription(tasks, commands[1], commands[2])
 	default:
 		return ErrUnknownCommand
 	}
@@ -107,6 +115,29 @@ func markTaskAs(tasks *[]Task, idParameter string, status string) error {
 	for index, task := range *tasks {
 		if task.ID == num {
 			(*tasks)[index].Status = status
+			(*tasks)[index].UpdatedAt = time.Now().UTC()
+			foundTask = true
+			break
+		}
+	}
+	if !foundTask {
+		return ErrNoTasksFound
+	}
+	return nil
+}
+
+func UpdateTaskDescription(tasks *[]Task, idParameter string, description string) error {
+	foundTask := false
+	if len(*tasks) == 0 {
+		return ErrNoTasksFound
+	}
+	num, err := strconv.Atoi(idParameter)
+	if err != nil {
+		return ErrCantConvertStringToInt
+	}
+	for index, task := range *tasks {
+		if task.ID == num {
+			(*tasks)[index].Description = description
 			(*tasks)[index].UpdatedAt = time.Now().UTC()
 			foundTask = true
 			break
