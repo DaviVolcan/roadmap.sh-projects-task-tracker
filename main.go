@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -33,11 +34,25 @@ func Dispatcher(commands []string, tasks *[]Task) error {
 			return listTasksByStatus(tasks, commands[1])
 		}
 		return listAllTasks(tasks)
-
+	case "mark-in-progress":
+		if numberOfArgs > 2 {
+			return ErrTooManyArguments
+		}
+		if numberOfArgs == 1 {
+			return ErrTooFewArguments
+		}
+		return markTaskAs(tasks, commands[1], "in-progress")
+	case "done":
+		if numberOfArgs > 2 {
+			return ErrTooManyArguments
+		}
+		if numberOfArgs == 1 {
+			return ErrTooFewArguments
+		}
+		return markTaskAs(tasks, commands[1], "done")
 	default:
 		return ErrUnknownCommand
 	}
-
 }
 
 func addTask(description string, tasks *[]Task) {
@@ -72,6 +87,28 @@ func listTasksByStatus(tasks *[]Task, status string) error {
 		if task.Status == status {
 			printTask(task)
 			foundTask = true
+		}
+	}
+	if !foundTask {
+		return ErrNoTasksFound
+	}
+	return nil
+}
+
+func markTaskAs(tasks *[]Task, idParameter string, status string) error {
+	foundTask := false
+	if len(*tasks) == 0 {
+		return ErrNoTasksFound
+	}
+	num, err := strconv.Atoi(idParameter)
+	if err != nil {
+		return ErrCantConvertStringToInt
+	}
+	for index, task := range *tasks {
+		if task.ID == num {
+			(*tasks)[index].Status = status
+			foundTask = true
+			break
 		}
 	}
 	if !foundTask {
