@@ -28,6 +28,11 @@ func Dispatcher(commands []string, tasks *[]Task) error {
 		}
 		addTask(commands[1], tasks)
 		return nil
+	case "list":
+		if numberOfArgs > 1 {
+			return listTasksByStatus(tasks, commands[1])
+		}
+		return listAllTasks(tasks)
 
 	default:
 		return ErrUnknownCommand
@@ -39,12 +44,44 @@ func addTask(description string, tasks *[]Task) {
 	instantTIme := time.Now().UTC()
 	task := Task{
 		ID:          time.Now().Nanosecond(),
+		Status:      "todo",
 		Description: description,
 		CreatedAt:   instantTIme,
 		UpdatedAt:   instantTIme,
 	}
 
 	*tasks = append(*tasks, task)
+}
+
+func listAllTasks(tasks *[]Task) error {
+	if len(*tasks) == 0 {
+		return ErrNoTasksFound
+	}
+	for _, task := range *tasks {
+		printTask(task)
+	}
+	return nil
+}
+
+func listTasksByStatus(tasks *[]Task, status string) error {
+	foundTask := false
+	if len(*tasks) == 0 {
+		return ErrNoTasksFound
+	}
+	for _, task := range *tasks {
+		if task.Status == status {
+			printTask(task)
+			foundTask = true
+		}
+	}
+	if !foundTask {
+		return ErrNoTasksFound
+	}
+	return nil
+}
+
+func printTask(task Task) {
+	fmt.Printf("%+v\n", task)
 }
 
 func main() {
@@ -63,11 +100,12 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	fmt.Println(err)
 	err = saveTasks(tasks, "tasks.json")
 	if err != nil {
 		panic(err)
 	}
+
+	fmt.Println("sucess!")
 
 }
 
@@ -104,4 +142,4 @@ var ErrUnknownCommand = errors.New("unknown command")
 var ErrTooManyArguments = errors.New("too many arguments")
 var ErrTooFewArguments = errors.New("too few arguments")
 var ErrCantConvertStringToInt = errors.New("can't convert string to int")
-var ErrFailedToOpenFile = errors.New("failed to open file")
+var ErrNoTasksFound = errors.New("no tasks found")
