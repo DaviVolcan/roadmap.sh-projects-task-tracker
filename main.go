@@ -213,8 +213,6 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println("sucess!")
-
 }
 
 func loadTasks(filename string) (error, []Task) {
