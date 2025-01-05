@@ -58,6 +58,14 @@ func Dispatcher(commands []string, tasks *[]Task) error {
 			return ErrTooFewArguments
 		}
 		return UpdateTaskDescription(tasks, commands[1], commands[2])
+	case "delete":
+		if numberOfArgs > 2 {
+			return ErrTooManyArguments
+		}
+		if numberOfArgs == 1 {
+			return ErrTooFewArguments
+		}
+		return DeleteTask(tasks, commands[1])
 	default:
 		return ErrUnknownCommand
 	}
