@@ -82,6 +82,7 @@ func addTask(description string, tasks *[]Task) {
 		UpdatedAt:   instantTIme,
 	}
 
+	fmt.Printf("Task added successfully (ID:%d)", task.ID)
 	*tasks = append(*tasks, task)
 }
 
