@@ -69,7 +69,6 @@ func Dispatcher(commands []string, tasks *[]Task) error {
 	default:
 		return ErrUnknownCommand
 	}
-	return nil
 }
 
 func addTask(description string, tasks *[]Task) {
