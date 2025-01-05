@@ -69,6 +69,7 @@ func Dispatcher(commands []string, tasks *[]Task) error {
 	default:
 		return ErrUnknownCommand
 	}
+	return nil
 }
 
 func addTask(description string, tasks *[]Task) {
@@ -157,12 +158,40 @@ func UpdateTaskDescription(tasks *[]Task, idParameter string, description string
 	return nil
 }
 
+func DeleteTask(tasks *[]Task, idParameter string) error {
+	foundTask := false
+	if len(*tasks) == 0 {
+		return ErrNoTasksFound
+	}
+	num, err := strconv.Atoi(idParameter)
+	if err != nil {
+		return ErrCantConvertStringToInt
+	}
+	TaskIndex := 0
+	for index, task := range *tasks {
+		if task.ID == num {
+			TaskIndex = index
+			foundTask = true
+			break
+		}
+	}
+	if !foundTask {
+		return ErrNoTasksFound
+	}
+	DeleteTaskByIndex(tasks, TaskIndex)
+	return nil
+}
+
+func DeleteTaskByIndex(tasks *[]Task, index int) {
+	*tasks = append((*tasks)[:index], (*tasks)[index+1:]...)
+	fmt.Println(*tasks)
+}
+
 func printTask(task Task) {
 	fmt.Printf("%+v\n", task)
 }
 
 func main() {
-
 	args := os.Args[1:]
 	if len(args) == 0 {
 		fmt.Println("Nenhum argumento foi passado.")
@@ -172,11 +201,13 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
 	err = Dispatcher(args, &tasks)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+
 	err = saveTasks(tasks, "tasks.json")
 	if err != nil {
 		panic(err)
